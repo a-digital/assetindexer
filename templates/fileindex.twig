@@ -1,0 +1,34 @@
+{#
+/**
+ * Asset Indexer plugin for Craft CMS
+ *
+ * fileindex.twig
+ *
+ * @author    Matt Shearing
+ * @copyright Copyright (c) 2016 Matt Shearing
+ * @link      http://adigital.agency
+ * @package   AssetIndexer
+ * @since     1.0.0
+ */
+#}
+
+{% extends "_layouts/cp" %}
+
+{% set title = "Asset Indexer"|t %}
+
+{% set content %}
+	{% import "_includes/forms" as forms %}
+	
+	{% includeCssResource "assetindexer/css/AssetIndexer_Style.css" %}
+	{% includeJsResource "assetindexer/js/AssetIndexer_Script.js" %}
+	{% if source is defined %}
+		<span id="source">{{ source }}</span>
+		{% if step is defined %}
+			<span id="filecount">{{ step }}</span>
+			{% includeJsResource "assetindexer/js/AssetIndexer_FileAjax.js" %}
+		{% else %}
+			{% includeJsResource "assetindexer/js/AssetIndexer_FileAjax.js" %}
+		{% endif %}
+	{% endif %}
+	
+{% endset %}

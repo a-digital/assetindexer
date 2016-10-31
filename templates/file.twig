@@ -1,0 +1,33 @@
+{#
+/**
+ * Asset Indexer plugin for Craft CMS
+ *
+ * file.twig
+ *
+ * @author    Matt Shearing
+ * @copyright Copyright (c) 2016 Matt Shearing
+ * @link      http://adigital.agency
+ * @package   AssetIndexer
+ * @since     1.0.0
+ */
+#}
+
+
+{% if step is defined %}
+	{% set start = step %}
+{% else %}
+	{% set start = 0 %}
+{% endif %}
+
+{% set data = craft.assetIndexer.IndexFiles(source, start) %}
+<p>Count: {{ data.count }} of {{ data.total }}</p>
+
+{% if data.count == data.total %}
+	{% redirect 'cms/assetindexer/complete' %}
+{% else %}
+	<script>
+		$(document).ready(function(){
+			$(".body").load("/cms/assetindexer/file/{{ source }}/{{ data.count }}");
+		});
+	</script>
+{% endif %}

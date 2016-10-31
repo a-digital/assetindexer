@@ -1,0 +1,14 @@
+{
+	"name": "/assetindexer",
+	"description": "Index a very large assets folder in batches when Craft fails to do so",
+	"type": "craft-plugin",
+	"authors": [
+		{
+			"name": "Matt Shearing",
+			"homepage": "http://adigital.agency"
+		}
+	],
+	"require": {
+		"composer/installers": "~1.0"
+	}
+}
