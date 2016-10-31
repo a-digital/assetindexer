@@ -42,3 +42,5 @@ Some things to do, and ideas for potential features:
 * Initial release
 
 Brought to you by [Matt Shearing](http://adigital.agency) from A Digital
+
+Icon made by [Freepik](http://www.freepik.com) from [www.flaticon.com](http://www.flaticon.com) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/)
