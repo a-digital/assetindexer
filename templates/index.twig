@@ -22,7 +22,6 @@
 	{% includeCssResource "assetindexer/css/AssetIndexer_Style.css" %}
 	{% includeJsResource "assetindexer/js/AssetIndexer_Script.js" %}
 	
-	<p>Content goes here</p>
 	{% set sources = craft.assetIndexer.AssetSources() %}
 	{% for source in sources %}
 		<p>{{ source.name }} - <a href="{{ url('assetindexer/begin') }}/{{ source.handle }}">Index Now</a></p>
