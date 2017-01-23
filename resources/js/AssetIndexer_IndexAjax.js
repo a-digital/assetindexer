@@ -12,10 +12,11 @@
  
 $(document).ready(function(){
 	if ($("#source").length) {
+		var cpTrigger = $("#cpTigger").text();
 		if ($("#stepcount").length) {
-			$(".body").load("/cms/assetindexer/step/"+$("#source").text()+"/"+$("#stepcount").text());
+			$(".body").load("/"+cpTrigger+"/assetindexer/step/"+$("#source").text()+"/"+$("#stepcount").text());
 		} else {
-			$(".body").load("/cms/assetindexer/step/"+$("#source").text());
+			$(".body").load("/"+cpTrigger+"/assetindexer/step/"+$("#source").text());
 		}
 	}
 });
