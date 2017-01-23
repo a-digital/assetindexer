@@ -37,6 +37,11 @@ Some things to do, and ideas for potential features:
 
 ## Asset Indexer Changelog
 
+### 1.0.1 -- 2017.01.23
+
+* Added support for cpTrigger config setting
+* Fixed issue if a S3 subfolder does not exist and you are using the root folder
+
 ### 1.0.0 -- 2016.10.21
 
 * Initial release
