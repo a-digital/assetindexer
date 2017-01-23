@@ -28,13 +28,13 @@
 {% if data.count == data.total %}
 	<script>
 		$(document).ready(function(){
-			window.location.replace("/cms/assetindexer/fileindex/{{ source }}");
+			window.location.replace("/{{ data.cpTrigger }}/assetindexer/fileindex/{{ source }}");
 		});
 	</script>
 {% else %}
 	<script>
 		$(document).ready(function(){
-			$(".body").load("/cms/assetindexer/step/{{ source }}/{{ data.count }}");
+			$(".body").load("/{{ data.cpTrigger }}/assetindexer/step/{{ source }}/{{ data.count }}");
 		});
 	</script>
 {% endif %}

@@ -21,6 +21,7 @@
 	
 	{% includeCssResource "assetindexer/css/AssetIndexer_Style.css" %}
 	{% includeJsResource "assetindexer/js/AssetIndexer_Script.js" %}
+	<span id="cpTrigger">{{ craft.assetIndexer.cpTrigger() }}</span>
 	{% if source is defined %}
 		<span id="source">{{ source }}</span>
 		{% if step is defined %}

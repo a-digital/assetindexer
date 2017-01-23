@@ -38,6 +38,11 @@ class AssetIndexerVariable
 		return $response;
     }
     
+    public function cpTrigger()
+    {
+	    return craft()->config->get('cpTrigger');
+    }
+    
     public function IndexAssets($folder = null, $start = null)
     {
 		$response = craft()->assetIndexer->getAssets($folder, $start);

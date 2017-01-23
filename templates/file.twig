@@ -23,11 +23,11 @@
 <p>Count: {{ data.count }} of {{ data.total }}</p>
 
 {% if data.count == data.total %}
-	{% redirect 'cms/assetindexer/complete' %}
+	{% redirect data.cpTrigger ~ '/assetindexer/complete' %}
 {% else %}
 	<script>
 		$(document).ready(function(){
-			$(".body").load("/cms/assetindexer/file/{{ source }}/{{ data.count }}");
+			$(".body").load("/{{ data.cpTrigger }}/assetindexer/file/{{ source }}/{{ data.count }}");
 		});
 	</script>
 {% endif %}
