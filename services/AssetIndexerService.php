@@ -51,7 +51,10 @@ class AssetIndexerService extends BaseApplicationComponent
 		$s3Client = new \Aws\S3\S3Client($options);
 		$s3Client->registerStreamWrapper();
 		
-		$dir = "s3://".$settings->bucket."/".$settings->subfolder."/";
+		$dir = "s3://".$settings->bucket."/";
+		if (isset($settings->subfolder) && $settings->subfolder <> "") {
+			$dir .= $settings->subfolder."/";
+		}
 		
 		$totalfiles = array_diff(scandir($dir), array(".", "..", "_thumbs", "_optimized"));
 		$num_files = count($totalfiles);
@@ -61,6 +64,7 @@ class AssetIndexerService extends BaseApplicationComponent
 		
 		$sessionId = "2dd57e0b-992a-4251-a19e-7d0fcbd600e7";
 		$sourceId = $sourceRecord["id"];
+		$cpTrigger = craft()->config->get('cpTrigger');
 		
 		$files = array();
 		if (is_dir($dir) && ($dh = opendir($dir))) {
@@ -86,7 +90,8 @@ class AssetIndexerService extends BaseApplicationComponent
 							$data = array(
 								"files" => $files,
 								"count" => $count,
-								"total" => $num_files
+								"total" => $num_files,
+								"cpTrigger" => $cpTrigger
 							);
 							return $data;
 						}
@@ -99,7 +104,8 @@ class AssetIndexerService extends BaseApplicationComponent
 		$data = array(
 			"files" => $files,
 			"count" => $count,
-			"total" => $num_files
+			"total" => $num_files,
+			"cpTrigger" => $cpTrigger
 		);
 		return $data;
     }
@@ -119,7 +125,10 @@ class AssetIndexerService extends BaseApplicationComponent
 		$s3Client = new \Aws\S3\S3Client($options);
 		$s3Client->registerStreamWrapper();
 		
-		$dir = "s3://".$settings->bucket."/".$settings->subfolder."/";
+		$dir = "s3://".$settings->bucket."/";
+		if (isset($settings->subfolder) && $settings->subfolder <> "") {
+			$dir .= $settings->subfolder."/";
+		}
 		
 		$totalfiles = array_diff(scandir($dir), array(".", "..", "_thumbs", "_optimized"));
 		$num_files = count($totalfiles);
@@ -134,7 +143,8 @@ class AssetIndexerService extends BaseApplicationComponent
 		
 		$data = array(
 			"count" => $end,
-			"total" => $num_files
+			"total" => $num_files,
+			"cpTrigger" => craft()->config->get('cpTrigger')
 		);
 		return $data;
     }
