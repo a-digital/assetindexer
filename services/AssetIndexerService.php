@@ -22,6 +22,16 @@ namespace Craft;
 
 class AssetIndexerService extends BaseApplicationComponent
 {
+    private $sourceId;
+    private $sessionId = "2dd57e0b-992a-4251-a19e-7d0fcbd600e7";
+    private $cnt_files;
+    private $all_files;
+    private $dir;
+    private $s3Client;
+    private $credentials;
+    private $settings;
+    private $sourceRecord;
+
     /**
      * This function can literally be anything you want, and you can have as many service functions as you want
      *
@@ -38,59 +48,38 @@ class AssetIndexerService extends BaseApplicationComponent
     
     public function getAssets($folder, $start)
     {
-		$sourceRecord = craft()->db->createCommand()->select('id, settings')->from('assetsources')->where('handle="'.$folder.'"')->queryRow();
-		$settings = json_decode($sourceRecord["settings"]);
-		
-		$credentials = new \Aws\Credentials\Credentials($settings->keyId, $settings->secret);
-		$options = [
-			'version'     => 'latest',
-			'region'      => $settings->location,
-			'credentials' => $credentials
-		];
-		
-		$s3Client = new \Aws\S3\S3Client($options);
-		$s3Client->registerStreamWrapper();
-		
-		$dir = "s3://".$settings->bucket."/";
-		if (isset($settings->subfolder) && $settings->subfolder <> "") {
-			$dir .= $settings->subfolder."/";
-		}
-		
-		$totalfiles = array_diff(scandir($dir), array(".", "..", "_thumbs", "_optimized"));
-		$num_files = count($totalfiles);
+        $this->prep($folder);
 		
 		$count = 0;
 		$end = $start + 100;
-		
-		$sessionId = "2dd57e0b-992a-4251-a19e-7d0fcbd600e7";
-		$sourceId = $sourceRecord["id"];
+
 		$cpTrigger = craft()->config->get('cpTrigger');
 		
 		$files = array();
-		if (is_dir($dir) && ($dh = opendir($dir))) {
+		if (is_dir($this->dir) && ($dh = opendir($this->dir))) {
 			while (($file = readdir($dh)) !== false) {
-				if (filetype($dir . $file) == "file") {
+				if (filetype($this->dir . $file) == "file") {
 					if ($count >= $start) {
 						if ($count < $end) {
 							craft()->db->createCommand()->insert('assetindexdata', array(
-								"sessionId" => $sessionId,
-								"sourceId" => $sourceId,
+								"sessionId" => $this->sessionId,
+								"sourceId" => $this->sourceId,
 								"offset" => $count,
 								"uri" => $file,
-								"size" => filesize($dir . $file)
+								"size" => filesize($this->dir . $file)
 							));
 							
 							$files[$count] = array(
 								"filename" => $file,
-								"filetype" => filetype($dir . $file),
-								"filesize" => filesize($dir . $file)
+								"filetype" => filetype($this->dir . $file),
+								"filesize" => filesize($this->dir . $file)
 							);
 						} else {
 							closedir($dh);
 							$data = array(
 								"files" => $files,
 								"count" => $count,
-								"total" => $num_files,
+								"total" => $this->cnt_files,
 								"cpTrigger" => $cpTrigger
 							);
 							return $data;
@@ -104,7 +93,7 @@ class AssetIndexerService extends BaseApplicationComponent
 		$data = array(
 			"files" => $files,
 			"count" => $count,
-			"total" => $num_files,
+			"total" => $this->cnt_files,
 			"cpTrigger" => $cpTrigger
 		);
 		return $data;
@@ -112,41 +101,59 @@ class AssetIndexerService extends BaseApplicationComponent
     
     public function getFiles($folder, $start)
     {
-	    $sourceRecord = craft()->db->createCommand()->select('id, settings')->from('assetsources')->where('handle="'.$folder.'"')->queryRow();
-	    $settings = json_decode($sourceRecord["settings"]);
-		
-		$credentials = new \Aws\Credentials\Credentials($settings->keyId, $settings->secret);
-		$options = [
-			'version'     => 'latest',
-			'region'      => $settings->location,
-			'credentials' => $credentials
-		];
-		
-		$s3Client = new \Aws\S3\S3Client($options);
-		$s3Client->registerStreamWrapper();
-		
-		$dir = "s3://".$settings->bucket."/";
-		if (isset($settings->subfolder) && $settings->subfolder <> "") {
-			$dir .= $settings->subfolder."/";
-		}
-		
-		$totalfiles = array_diff(scandir($dir), array(".", "..", "_thumbs", "_optimized"));
-		$num_files = count($totalfiles);
+        $this->prep($folder);
 		
 		$end = $start + 1;
+
+		$sourceId = $this->sourceRecord["id"];
 		
-		$sessionId = "2dd57e0b-992a-4251-a19e-7d0fcbd600e7";
-		$sourceId = $sourceRecord["id"];
-		
-		craft()->assetIndexing->processIndexForSource($sessionId, $start, $sourceId);
-		craft()->db->createCommand()->delete('assetindexdata', array('AND', 'sessionId=:sessionId', 'offset=:offset'), array(':offset'=>$start, ':sessionId'=>$sessionId));
+		craft()->assetIndexing->processIndexForSource($this->sessionId, $start, $sourceId);
+		craft()->db->createCommand()->delete('assetindexdata', array('AND', 'sessionId=:sessionId', 'offset=:offset'), array(':offset'=>$start, ':sessionId'=>$this->sessionId));
 		
 		$data = array(
 			"count" => $end,
-			"total" => $num_files,
+			"total" => $this->cnt_files,
 			"cpTrigger" => craft()->config->get('cpTrigger')
 		);
 		return $data;
+    }
+
+    private function prep($folder)
+    {
+        $this->sourceRecord = craft()->db->createCommand()->select('id, settings')->from('assetsources')->where('handle="' . $folder . '"')->queryRow();
+        $this->settings = json_decode($this->sourceRecord["settings"]);
+
+        $this->credentials = new \Aws\Credentials\Credentials($this->settings->keyId, $this->settings->secret);
+        $options = [
+            'version'     => 'latest',
+            'region'      => $this->processLocation($this->settings->location),
+            'credentials' => $this->credentials
+        ];
+
+        $this->s3Client = new \Aws\S3\S3Client($options);
+        $this->s3Client->registerStreamWrapper();
+
+        $this->dir = "s3://" . $this->settings->bucket . "/";
+        if (isset($this->settings->subfolder) && $this->settings->subfolder <> "") {
+            $this->dir .= $this->settings->subfolder."/";
+        }
+
+        $this->all_files = array_diff(scandir($this->dir), array(".", "..", "_thumbs", "_optimized"));
+        $this->cnt_files = count($this->all_files);
+
+        $this->sourceId = $this->sourceRecord["id"];
+    }
+
+    private function processLocation($location)
+    {
+        // Craft uses short hand for their predefined locations... AWS barfs on it.
+        // The list can be found in \Craft\S3AssetSourceType::$_predefinedEndpoints
+        $loc = strtolower(trim($location));
+
+        if ($loc == 'us') return 'us-east-1';
+        if ($loc == 'eu') return 'eu-west-1';
+
+        return $location;
     }
 
 }
