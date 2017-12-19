@@ -20,6 +20,8 @@ Asset Indexer works on Craft 2.4.x and Craft 2.5.x.
 
 This plugin was created after we hit issues indexing assets from S3 on a fresh install of Craft where we wanted to pull all of the images into a new site build. To get around it we submitted a ticket to Pixel & Tonic and the friendly guys helped to guide us towards creating this plugin. Thank you to Andris in particular at Pixel & Tonic. We have released this for anyone else having issues like we did as we want to help the Craft community.
 
+This plugin only indexes S3 asset sources. If you need local sources to be indexed then please use [Batch Asset Indexer](https://github.com/bymayo/batch-asset-indexer) which has been created by [bymayo](https://github.com/bymayo)
+
 ## Configuring Asset Indexer
 
 There is no configuration necessary if your S3 asset sources are set up correctly as this plugin takes all of the settings it needs from there.
