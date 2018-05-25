@@ -14,9 +14,9 @@ $(document).ready(function(){
 	if ($("#source").length) {
 		var cpTrigger = $("#cpTigger").text();
 		if ($("#filecount").length) {
-			$(".body").load("/"+cpTrigger+"/assetindexer/file/"+$("#source").text()+"/"+$("#filecount").text());
+			$(".body").load(window.Craft.baseCpUrl+"/"+cpTrigger+"/assetindexer/file/"+$("#source").text()+"/"+$("#filecount").text(), standardResponseCallback);
 		} else {
-			$(".body").load("/"+cpTrigger+"/assetindexer/file/"+$("#source").text());
+			$(".body").load(window.Craft.baseCpUrl+"/"+cpTrigger+"/assetindexer/file/"+$("#source").text(), standardResponseCallback);
 		}
 	}
 });
